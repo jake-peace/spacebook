@@ -22,7 +22,7 @@ class Profile extends Component {
         this.unsubscribe = this.props.navigation.addListener('focus', () => {
             this.checkLoggedIn();
         });
-
+        this.getFriendList();
     }
 
     componentWillUnmount() {
@@ -121,7 +121,7 @@ render() {
               <Text>their photo</Text>
             </View>
               )}
-            keyExtractor={(item,index) => item.post_id.toString()}
+            keyExtractor={(item,index) => item.user_id.toString()}
           />
           <TouchableOpacity
             style={styles.postButton}
