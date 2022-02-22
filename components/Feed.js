@@ -39,7 +39,7 @@ class feed extends Component {
       first_name: '',
       friendList: [],
       postList: [],
-      sortedPostList: []
+      tempPostList: []
     }
 
   }
@@ -128,7 +128,7 @@ class feed extends Component {
   getListOfFriends = async () => {
     const value = await AsyncStorage.getItem('@session_token');
     this.user_id = await AsyncStorage.getItem('@user_id');
-    fetch("http://localhost:3333/api/1.0.0/user/" + this.user_id + "/friends", {
+    return fetch("http://localhost:3333/api/1.0.0/user/" + this.user_id + "/friends", {
           method: 'get',
           headers: {
               'X-Authorization': value,
@@ -145,17 +145,36 @@ class feed extends Component {
           }
       })
       .then(async (responseJson) => {
-              console.log(responseJson);
-              this.setState({friendList: responseJson.data})
+              this.setState({friendList: responseJson})
       })
       .catch((error) => {
           console.log(error);
-      })
-    for(var i = 0; i < this.state.friendList.length; i++){
-      this.state.postList.push(this.getPostsOfFriend(this.state.friendList.user_id));
-    }
-    this.state.sortedPostList = this.state.postList.sort((a, b) => b.timestamp - a.timestamp);
-    console.log(this.state.sortedPostList);
+      })  
+  }
+
+  getAndSortPosts() {
+    //this.getPostsOfFriend("9");
+    console.log(this.getPostsOfFriend("9"));
+    return this.getPostsOfFriend("9");
+    //var addition = this.state.postList.concat(this.state.tempPostList);
+    //console.log(addition);
+    //this.setState({ postList: addition })
+    //for(var i = 0; i < this.state.friendList.length; i++){
+      //var addition = this.state.postList.concat(this.getPostsOfFriend(this.state.friendList[i].user_id).value);
+      //this.setState({ postList: addition })
+    //}
+    //this.sortPosts();
+  }
+
+  sortPosts() {
+    let sortedPostList = this.state.postList.sort((a, b) => {
+      return b.timestamp - a.timestamp;
+    });
+
+    this.setState({
+      postList: sortedPostList
+    });
+    console.log(sortedPostList);
   }
 
   getPostsOfFriend = async (friendID) => {
@@ -178,8 +197,7 @@ class feed extends Component {
           }
       })
       .then(async (responseJson) => {
-              console.log(responseJson);
-              return responseJson;
+            return responseJson;
       })
       .catch((error) => {
           console.log(error);
@@ -194,7 +212,6 @@ class feed extends Component {
               'X-Authorization': value,
               'Content-Type': 'application/json'
           },
-          //body: JSON.stringify(state)
       })
       .then((response) => {
           if(response.status === 200){
@@ -224,6 +241,8 @@ class feed extends Component {
 }
 
   render() {
+    console.log(this.getAndSortPosts());
+    console.log(this.getPostsOfFriend("9"));
     if (this.state.isLoading){
       return (
         <View
@@ -238,23 +257,23 @@ class feed extends Component {
       );
     }else{
       return (
+        console.log(this.state.sortedPostList),
         <View>
           <Text>Welcome {this.state.first_name}. Your friend's posts are below.</Text>
           <FlatList
-            data={this.state.sortedPostList}
+            data={this.getPostsOfFriend("9")}
             renderItem={({item}) => (
             <View>
               <Text>On {this.formatDate(item.timestamp)},</Text>
-              <Text>{item.author.first_name} said "{item.text}"</Text>
+              <Text>{item.author.first_name} {item.author.last_name} said "{item.text}"</Text>
               <TouchableOpacity
-                onPress={() => this.likePost(item.post_id)}
               >
                 <Text>Like this post</Text>
               </TouchableOpacity>
               <Text>{item.numLikes} likes</Text>
             </View>
               )}
-            keyExtractor={(item,index) => item.post_id.toString()}
+            //keyExtractor={(item,index) => item.user_id.toString()}
           />
         </View>
       );
