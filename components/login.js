@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { StyleSheet, View, Text, Image, ScrollView, TextInput } from 'react-native';
 import { NavigationContainer, useLinkProps } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -12,9 +12,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
     const [password, setPassword] = useState('');
 
     const login = async () => {
-
-      
-
       const state = {
         email: email,
         password: password

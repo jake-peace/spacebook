@@ -4,7 +4,7 @@ import { NavigationContainer, useLinkProps } from '@react-navigation/native';
 import { TouchableOpacity } from 'react-native-web';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-class Profile extends Component {
+class Friends extends Component {
 
     constructor(props){
         super(props);
@@ -13,7 +13,8 @@ class Profile extends Component {
             isLoading: true,
             user_id: '',
             first_name: '',
-            friendList: []
+            friendList: [],
+            ppList: []
         }
 
     }
@@ -22,7 +23,7 @@ class Profile extends Component {
         this.unsubscribe = this.props.navigation.addListener('focus', () => {
             this.checkLoggedIn();
         });
-        this.getFriendList();
+        this.getFriendRequests();
     }
 
     componentWillUnmount() {
@@ -50,7 +51,6 @@ class Profile extends Component {
     })
     .then((responseJson) => {
         this.setState({
-        isLoading: false,
         })
     })
     .catch((error) => {
@@ -58,10 +58,10 @@ class Profile extends Component {
     })
     }
 
-    getFriendList = async () => {
+    getFriendRequests = async () => {
         const value = await AsyncStorage.getItem('@session_token');
         this.user_id = await AsyncStorage.getItem('@user_id');
-        return fetch("http://localhost:3333/api/1.0.0/user/" + this.user_id + "/friends", {
+        return fetch("http://localhost:3333/api/1.0.0/friendrequests", {
             method: 'get',
             headers: {
             'X-Authorization':  value,
@@ -79,13 +79,16 @@ class Profile extends Component {
         })
         .then((responseJson) => {
             this.setState({
-            friendList: responseJson
+            friendList: responseJson,
+            isLoading: false
             })
         })
         .catch((error) => {
             console.log(error);
         })
     }
+
+    
 
     checkLoggedIn = async () => {
     const value = await AsyncStorage.getItem('@session_token');
@@ -105,32 +108,46 @@ class Profile extends Component {
     }
 
 render() {
-
-    return (
-        
+    if (this.state.isLoading){
+        return (
+          <View
+            style={{
+              flex: 1,
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Text>not be long...</Text>
+          </View>
+        );
+      }else{
+    return (  
         <View>
-            <Text>{this.state.first_name}</Text>
-            <Text>you have {this.state.friendList.length} friends</Text>
-            <Text>Your Friends:</Text>
+            <Text>Friend Requests</Text>
+            <Text>you have {this.state.friendList.length} friend requests</Text>
             <FlatList
             data={this.state.friendList}
-            
             renderItem={({item}) => (
-            
             <View>
-              <Text>{item.first_name} {item.last_name}</Text>
+              <Text>{item.first_name} {item.last_name} has sent you a friend request</Text>
               <Text>their photo</Text>
+              <TouchableOpacity
+                style={styles.acceptButton}
+              >
+                <Text>Accept Request</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.rejectButton}
+              >
+                <Text>Reject Request</Text>
+              </TouchableOpacity>
             </View>
               )}
             keyExtractor={(item,index) => item.user_id.toString()}
           />
-          <TouchableOpacity
-            style={styles.postButton}
-          >
-            <Text>Post</Text>
-          </TouchableOpacity>
+          
         </View>
-    )
+    )}
 }
 }
 
@@ -152,4 +169,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default Profile;
+export default Friends;

@@ -26,7 +26,102 @@ const feed = ({navigation}) => {
   );
 }
 */
+const FeedScreen = ({ navigation, route }) => {
 
+  const [firstName, setFirstName] = useState('');
+  const [friendList, setFriendList] = useState([]);
+
+  useEffect(() => { 
+    checkLoggedIn();
+    getFriends();
+    getData();
+  },[]);
+
+  const checkLoggedIn = async () => {
+    const value = await AsyncStorage.getItem('@session_token');
+    if (value == null) {
+        this.props.navigation.navigate('Login');
+    }
+  }
+
+  const getFriends = async () => {
+    const value = await AsyncStorage.getItem('@session_token');
+    const user_id = await AsyncStorage.getItem('@user_id');
+    return fetch("http://localhost:3333/api/1.0.0/user/" + user_id + "/friends", {
+        method: 'get',
+        headers: {
+            'X-Authorization': value,
+            'Content-Type': 'application/json'
+        },
+    })
+    .then((response) => {
+        if(response.status === 200){
+            return response.json()
+        }else if(response.status === 400){
+            throw 'Invalid email or password';
+        }else{
+            throw 'Something went wrong';
+        }
+    })
+    .then(async (responseJson) => {
+        setFriendList(responseJson)
+    })
+    .catch((error) => {
+        console.log(error);
+    })
+  
+  }
+
+  const getData = async () => {
+    const value = await AsyncStorage.getItem('@session_token');
+    const user_id = await AsyncStorage.getItem('@user_id');
+    return fetch("http://localhost:3333/api/1.0.0/user/" + user_id, {
+          method: 'get',
+          headers: {
+            'X-Authorization':  value,
+            'Content-Type': 'application/json'
+          }
+        })
+        .then((response) => {
+            if(response.status === 200){
+                return response.json()
+            }else if(response.status === 401){
+              this.props.navigation.navigate("Login");
+            }else{
+                throw 'Something went wrong';
+            }
+        })
+        .then((responseJson) => {
+            setFirstName(responseJson.first_name)
+        })
+        .catch((error) => {
+            console.log(error);
+        })
+  }
+
+  return (
+    <View>
+          <Text>Welcome {firstName}. Your friends are below.</Text>
+          <FlatList
+            data={friendList}
+            renderItem={({item}) => (
+            <View>
+              <Text>{item.user_givenname} {item.user_familyname}</Text>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('IndividualFriend', {friend_id: item.user_id})}
+              >
+                <Text>View {item.user_givenname}'s profile</Text>
+              </TouchableOpacity>
+            </View>
+              )}
+            keyExtractor={(item,index) => item.user_id.toString()}
+          />
+        </View>
+  )
+
+}
+
+/*
 class feed extends Component {
 
   constructor(props){
@@ -39,7 +134,7 @@ class feed extends Component {
       first_name: '',
       friendList: [],
       postList: [],
-      tempPostList: []
+      ppList: []
     }
 
   }
@@ -51,6 +146,7 @@ class feed extends Component {
   
     this.getData();
     this.getListOfFriends();
+    //this.getFriendPP();
   }
 
   componentWillUnmount() {
@@ -78,7 +174,6 @@ class feed extends Component {
         })
         .then((responseJson) => {
           this.setState({
-            isLoading: false,
             listData: responseJson
           })
           console.log(responseJson);
@@ -145,25 +240,19 @@ class feed extends Component {
           }
       })
       .then(async (responseJson) => {
-              this.setState({friendList: responseJson})
+        var tempPPList = [];
+            for(var i = 0; i < responseJson.length; i++){
+                tempPPList = tempPPList + this.getFriendPP(responseJson[i].user_id);
+            }
+            this.setState({
+            friendList: responseJson,
+            ppList: tempPPList,
+            isLoading: false
+            })
       })
       .catch((error) => {
           console.log(error);
       })  
-  }
-
-  getAndSortPosts() {
-    //this.getPostsOfFriend("9");
-    console.log(this.getPostsOfFriend("9"));
-    return this.getPostsOfFriend("9");
-    //var addition = this.state.postList.concat(this.state.tempPostList);
-    //console.log(addition);
-    //this.setState({ postList: addition })
-    //for(var i = 0; i < this.state.friendList.length; i++){
-      //var addition = this.state.postList.concat(this.getPostsOfFriend(this.state.friendList[i].user_id).value);
-      //this.setState({ postList: addition })
-    //}
-    //this.sortPosts();
   }
 
   sortPosts() {
@@ -240,9 +329,35 @@ class feed extends Component {
         date.getMinutes().toString());
 }
 
+getFriendPP = async (user_id) => {
+  const value = await AsyncStorage.getItem('@session_token');
+  this.user_id = await AsyncStorage.getItem('@user_id');
+  return fetch("http://localhost:3333/api/1.0.0/user/" + user_id + "/photo", {
+      method: 'get',
+      headers: {
+      'X-Authorization':  value,
+      'Content-Type': 'application/json'
+      }
+  })
+  .then((response) => {
+      if(response.status === 200){
+          return response.blob();
+      }else if(response.status === 401){
+          this.props.navigation.navigate("Login");
+      }else{
+          throw 'Something went wrong';
+      }
+  })
+  .then((responseBlob) => {
+      let data = URL.createObjectURL(responseBlob);
+      return data
+  })
+  .catch((error) => {
+      console.log(error);
+  })
+}
+
   render() {
-    console.log(this.getAndSortPosts());
-    console.log(this.getPostsOfFriend("9"));
     if (this.state.isLoading){
       return (
         <View
@@ -257,23 +372,21 @@ class feed extends Component {
       );
     }else{
       return (
-        console.log(this.state.sortedPostList),
         <View>
-          <Text>Welcome {this.state.first_name}. Your friend's posts are below.</Text>
+          <Text>Welcome {this.state.first_name}. Your friends are below.</Text>
           <FlatList
-            data={this.getPostsOfFriend("9")}
+            data={this.state.friendList}
             renderItem={({item}) => (
             <View>
-              <Text>On {this.formatDate(item.timestamp)},</Text>
-              <Text>{item.author.first_name} {item.author.last_name} said "{item.text}"</Text>
+              <Text>{item.user_givenname} {item.user_familyname}</Text>
               <TouchableOpacity
+                onPress={() => navigation.navigate('IndividualFriend', {friend_id: item.user_id})}
               >
-                <Text>Like this post</Text>
+                <Text>View {item.user_givenname}'s profile</Text>
               </TouchableOpacity>
-              <Text>{item.numLikes} likes</Text>
             </View>
               )}
-            //keyExtractor={(item,index) => item.user_id.toString()}
+            keyExtractor={(item,index) => item.user_id.toString()}
           />
         </View>
       );
@@ -282,4 +395,12 @@ class feed extends Component {
   }
 }
 
-export default feed;
+const styles = StyleSheet.create({
+  image: {
+      height: '100px',
+      width: '100px',
+      borderRadius: '50px'
+  }
+})
+*/
+export default FeedScreen;

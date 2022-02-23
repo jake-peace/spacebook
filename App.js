@@ -16,6 +16,7 @@ import SignupScreen from './components/Signup';
 import FeedScreen from './components/Feed';
 import ProfileScreen from './components/Profile';
 import FriendScreen from './components/Friends';
+import IndividualFriendScreen from './components/IndivFriend';
 
 
 
@@ -26,11 +27,20 @@ const Stack = createNativeStackNavigator();
 const Main = () => {
   return (
     <Tab.Navigator>
-      <Tab.Screen name="Feed" component={FeedScreen}/>
+      <Tab.Screen name="Feed" component={Feed}/>
       <Tab.Screen name="Profile" component={ProfileScreen} />
       <Tab.Screen name="Friends" component={FriendScreen} />
     </Tab.Navigator>
   );
+}
+
+const Feed = () => {
+  return (
+    <Stack.Navigator initialRouteName='MainFeed'>
+      <Stack.Screen name="MainFeed" component={FeedScreen}/>
+      <Stack.Screen name="IndividualFriend" component={IndividualFriendScreen}/>
+    </Stack.Navigator>
+  )
 }
 
 const App = () => {
