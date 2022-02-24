@@ -27,9 +27,9 @@ const Stack = createNativeStackNavigator();
 const Main = () => {
   return (
     <Tab.Navigator>
-      <Tab.Screen name="Feed" component={Feed}/>
+      <Tab.Screen name="Feed" component={Feed} options={{ headerShown: false }}/>
       <Tab.Screen name="Profile" component={ProfileScreen} />
-      <Tab.Screen name="Friends" component={FriendScreen} />
+      <Tab.Screen name="Friends" component={FriendScreen} options={{ title: 'Friend Requests'}} />
     </Tab.Navigator>
   );
 }
@@ -38,7 +38,7 @@ const Feed = () => {
   return (
     <Stack.Navigator initialRouteName='MainFeed'>
       <Stack.Screen name="MainFeed" component={FeedScreen}/>
-      <Stack.Screen name="IndividualFriend" component={IndividualFriendScreen}/>
+      <Stack.Screen name="IndividualFriend" component={IndividualFriendScreen} options={({route}) => ({title:route.params.name + "'s profile"})} />
     </Stack.Navigator>
   )
 }

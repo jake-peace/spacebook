@@ -26,16 +26,19 @@ const feed = ({navigation}) => {
   );
 }
 */
+
 const FeedScreen = ({ navigation, route }) => {
 
   const [firstName, setFirstName] = useState('');
   const [friendList, setFriendList] = useState([]);
+  const [ppList, setPPList] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => { 
     checkLoggedIn();
     getFriends();
     getData();
-  },[]);
+  },[isLoading]);
 
   const checkLoggedIn = async () => {
     const value = await AsyncStorage.getItem('@session_token');
@@ -65,11 +68,44 @@ const FeedScreen = ({ navigation, route }) => {
     })
     .then(async (responseJson) => {
         setFriendList(responseJson)
+        console.log(responseJson)
+        console.log(friendList)
+        for(var i = 0; i < responseJson.length; i++){
+          getFriendPP(responseJson[i].user_id)
+        }
+        setIsLoading(false);
     })
     .catch((error) => {
         console.log(error);
     })
-  
+  }
+
+  const getFriendPP = async (friend_id) => {
+    const value = await AsyncStorage.getItem('@session_token');
+    return fetch("http://localhost:3333/api/1.0.0/user/" + friend_id + "/photo", {
+        method: 'get',
+        headers: {
+        'X-Authorization':  value,
+        'Content-Type': 'application/json'
+        }
+    })
+    .then((response) => {
+        if(response.status === 200){
+            return response.blob();
+        }else if(response.status === 401){
+            this.props.navigation.navigate("Login");
+        }else{
+            throw 'Something went wrong';
+        }
+    })
+    .then((responseBlob) => {
+        let data = URL.createObjectURL(responseBlob);
+        setPPList([...ppList, data]);
+        console.log(ppList)
+    })
+    .catch((error) => {
+        console.log(error);
+    })
   }
 
   const getData = async () => {
@@ -99,16 +135,43 @@ const FeedScreen = ({ navigation, route }) => {
         })
   }
 
-  return (
-    <View>
+  const refreshPage = () => {
+    setIsLoading(true);
+  }
+
+  if (isLoading == true){
+    return (
+        <View
+        style={{
+            flex: 1,
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+        }}>
+        <Text>not be long...</Text>
+        </View>
+    );
+    }
+    else{
+      return (
+        <View>
+          <TouchableOpacity
+            onPress={() => refreshPage()}
+          >
+            <Text>Refresh Page</Text>
+          </TouchableOpacity>
           <Text>Welcome {firstName}. Your friends are below.</Text>
           <FlatList
             data={friendList}
-            renderItem={({item}) => (
+            renderItem={({item, index}) => (
             <View>
+              <Image
+                  style={styles.image}
+                  source={ppList[index]}
+              />
               <Text>{item.user_givenname} {item.user_familyname}</Text>
               <TouchableOpacity
-                onPress={() => navigation.navigate('IndividualFriend', {friend_id: item.user_id})}
+                onPress={() => navigation.navigate('IndividualFriend', {friend_id: item.user_id, name: item.user_givenname})}
               >
                 <Text>View {item.user_givenname}'s profile</Text>
               </TouchableOpacity>
@@ -117,8 +180,8 @@ const FeedScreen = ({ navigation, route }) => {
             keyExtractor={(item,index) => item.user_id.toString()}
           />
         </View>
-  )
-
+      )
+    }
 }
 
 /*
@@ -394,7 +457,7 @@ getFriendPP = async (user_id) => {
     
   }
 }
-
+*/
 const styles = StyleSheet.create({
   image: {
       height: '100px',
@@ -402,5 +465,5 @@ const styles = StyleSheet.create({
       borderRadius: '50px'
   }
 })
-*/
+
 export default FeedScreen;

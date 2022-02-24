@@ -1,8 +1,167 @@
-import React, {useState, Component} from 'react';
+import React, {useState, Component, useEffect} from 'react';
 import { StyleSheet, View, Text, Image, ScrollView, TextInput, FlatList, DevSettings } from 'react-native';
 import { NavigationContainer, useLinkProps } from '@react-navigation/native';
 import { TouchableOpacity } from 'react-native-web';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const Friends = ({ navigation, route }) => {
+
+    const [firstName, setFirstName] = useState('');
+    const [friendList, setFriendList] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [count, setCount] = useState(0);
+    const [ppList, setPPList] = useState([]);
+  
+    useEffect(() => { 
+      checkLoggedIn();
+      getFriendRequests();
+    },[isLoading]);
+  
+    const checkLoggedIn = async () => {
+      const value = await AsyncStorage.getItem('@session_token');
+      if (value == null) {
+          this.props.navigation.navigate('Login');
+      }
+    }
+
+    const getFriendRequests = async () => {
+        const value = await AsyncStorage.getItem('@session_token');
+        return fetch("http://localhost:3333/api/1.0.0/friendrequests", {
+            method: 'get',
+            headers: {
+            'X-Authorization':  value,
+            'Content-Type': 'application/json'
+            }
+        })
+        .then((response) => {
+            if(response.status === 200){
+                return response.json()
+            }else if(response.status === 401){
+                this.props.navigation.navigate("Login");
+            }else{
+                throw 'Something went wrong';
+            }
+        })
+        .then((responseJson) => {
+            setFriendList(responseJson)
+            for(var i = 0; i < responseJson.length; i++){
+                getFriendPP(responseJson[i].user_id)
+            }
+            setIsLoading(false);
+        })
+        .catch((error) => {
+            console.log(error);
+        })
+    }
+
+    const getFriendPP = async (friend_id) => {
+        const value = await AsyncStorage.getItem('@session_token');
+        return fetch("http://localhost:3333/api/1.0.0/user/" + friend_id + "/photo", {
+            method: 'get',
+            headers: {
+            'X-Authorization':  value,
+            'Content-Type': 'application/json'
+            }
+        })
+        .then((response) => {
+            if(response.status === 200){
+                return response.blob();
+            }else if(response.status === 401){
+                this.props.navigation.navigate("Login");
+            }else{
+                throw 'Something went wrong';
+            }
+        })
+        .then((responseBlob) => {
+            let data = URL.createObjectURL(responseBlob);
+            setPPList([...ppList, data]);
+        })
+        .catch((error) => {
+            console.log(error);
+        })
+    }
+
+    const acceptRequest = async (friend_id, accept) => {
+        const value = await AsyncStorage.getItem('@session_token');
+        let methodType = '';
+        if(accept == true){methodType = 'post'}
+        else{methodType = 'delete'}
+        return fetch("http://localhost:3333/api/1.0.0/friendrequests/" + friend_id, {
+            method: methodType,
+            headers: {
+            'X-Authorization':  value,
+            'Content-Type': 'application/json'
+            }
+        })
+        .then((response) => {
+            if(response.status === 200){
+                return response.blob();
+            }else if(response.status === 401){
+                this.props.navigation.navigate("Login");
+            }else{
+                throw 'Something went wrong';
+            }
+        })
+        .then((responseBlob) => {
+            let data = URL.createObjectURL(responseBlob);
+            setPPList([...ppList, data]);
+            setIsLoading(true)
+        })
+        .catch((error) => {
+            console.log(error);
+        })
+    }
+
+    if (isLoading == true){
+        return (
+            <View
+            style={{
+                flex: 1,
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}>
+            <Text>not be long...</Text>
+            </View>
+        );
+        }else{
+        return ( 
+            <View>
+                <Text>you have {friendList.length} friend requests</Text>
+                <FlatList
+                data={friendList}
+                renderItem={({item, index}) => (
+                <View>
+                    <Text>{item.first_name} {item.last_name} has sent you a friend request</Text>
+                    <Image
+                        style={styles.image}
+                        source={ppList[index]}
+                    />
+                    {console.log(ppList[0])}
+                    <Text>their photo</Text>
+                    <TouchableOpacity
+                    style={styles.acceptButton}
+                    onPress={() => acceptRequest(item.user_id, true)}
+                    >
+                    <Text>Accept Request</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                    style={styles.rejectButton}
+                    onPress={() => acceptRequest(item.user_id, false)}
+                    >
+                    <Text>Reject Request</Text>
+                    </TouchableOpacity>
+                </View>
+                    )}
+                keyExtractor={(item,index) => item.user_id.toString()}
+                />
+                
+            </View>
+        )}
+
+}
+
+/*
 
 class Friends extends Component {
 
@@ -123,7 +282,6 @@ render() {
       }else{
     return (  
         <View>
-            <Text>Friend Requests</Text>
             <Text>you have {this.state.friendList.length} friend requests</Text>
             <FlatList
             data={this.state.friendList}
@@ -150,6 +308,8 @@ render() {
     )}
 }
 }
+
+*/
 
 const styles = StyleSheet.create({
     image: {

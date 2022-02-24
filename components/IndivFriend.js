@@ -8,11 +8,12 @@ const IndivFriend = ({ navigation, route }) => {
 
     const {friend_id} = route.params;
     const [postList, setPostList] = useState([]);
+    const [isMessage, setIsMessage] = useState(false);
   
     useEffect(() => { 
       checkLoggedIn();
       getFriendsPosts();
-    },[]);
+    },[isMessage]);
   
     const checkLoggedIn = async () => {
       const value = await AsyncStorage.getItem('@session_token');
@@ -48,11 +49,14 @@ const IndivFriend = ({ navigation, route }) => {
     
     }
 
-    const likePost = async (postId) => {
+    const likePost = async (postId, like) => {
         const value = await AsyncStorage.getItem('@session_token');
         const user_id = await AsyncStorage.getItem('@user_id');
+        let methodType = '';
+        if(like == true){methodType = 'post'}
+        else{methodType = 'delete'}
         return fetch("http://localhost:3333/api/1.0.0/user/" + user_id + "/post/" + postId + "/like", {
-              method: 'post',
+              method: methodType,
               headers: {
                   'X-Authorization': value,
                   'Content-Type': 'application/json'
@@ -64,6 +68,7 @@ const IndivFriend = ({ navigation, route }) => {
               }else if(response.status === 400){
                   throw 'Invalid email or password';
               }else{
+                  setIsMessage(true);
                   throw 'Something went wrong';
               }
           })
@@ -85,26 +90,48 @@ const IndivFriend = ({ navigation, route }) => {
             date.getMinutes().toString());
     }
   
-    return (
-      <View>
-            <FlatList
-              data={postList}
-              renderItem={({item}) => (
-              <View>
-                <Text>on {formatDate(item.timestamp)}, {item.author.first_name} {item.author.last_name} said: </Text>
-                <Text>"{item.text}"</Text>
-                <Text>{item.numLikes} likes</Text>
-                <TouchableOpacity
-                  onPress={() => likePost(item.post_id)}
-                >
-                  <Text>Like post</Text>
-                </TouchableOpacity>
-              </View>
-                )}
-              keyExtractor={(item,index) => item.post_id.toString()}
-            />
-          </View>
-    )
+    if(isMessage == true)
+    {
+      return(
+        <View>
+          <Text>You've already liked this post.</Text>
+          <TouchableOpacity
+            onPress = {() => setIsMessage(false)}
+          >
+            <Text>Go Back</Text>
+          </TouchableOpacity>
+        </View>
+      )
+    }
+    else{
+      return (
+        <View>
+              <FlatList
+                data={postList}
+                renderItem={({item}) => (
+                <View>
+                  <Text>on {formatDate(item.timestamp)}, {item.author.first_name} {item.author.last_name} said: </Text>
+                  <Text>"{item.text}"</Text>
+                  <Text>{item.numLikes} likes</Text>
+                  <TouchableOpacity
+                    onPress={() => likePost(item.post_id, true)}
+                  >
+                    <Text>Like post</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => likePost(item.post_id, false)}
+                  >
+                    <Text>Unlike post</Text>
+                  </TouchableOpacity>
+                </View>
+                  )}
+                keyExtractor={(item,index) => item.post_id.toString()}
+              />
+            </View>
+      )
+
+    }
+    
   
   }
 
