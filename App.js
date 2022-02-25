@@ -17,7 +17,8 @@ import FeedScreen from './components/Feed';
 import ProfileScreen from './components/Profile';
 import FriendScreen from './components/Friends';
 import IndividualFriendScreen from './components/IndivFriend';
-
+import SearchScreen from './components/Search';
+import SearchResult from './components/SearchResult';
 
 
 
@@ -30,6 +31,7 @@ const Main = () => {
       <Tab.Screen name="Feed" component={Feed} options={{ headerShown: false }}/>
       <Tab.Screen name="Profile" component={ProfileScreen} />
       <Tab.Screen name="Friends" component={FriendScreen} options={{ title: 'Friend Requests'}} />
+      <Tab.Screen name="Search" component={Search} options={{ headerShown: false }}/>
     </Tab.Navigator>
   );
 }
@@ -39,6 +41,15 @@ const Feed = () => {
     <Stack.Navigator initialRouteName='MainFeed'>
       <Stack.Screen name="MainFeed" component={FeedScreen}/>
       <Stack.Screen name="IndividualFriend" component={IndividualFriendScreen} options={({route}) => ({title:route.params.name + "'s profile"})} />
+    </Stack.Navigator>
+  )
+}
+
+const Search = () => {
+  return (
+    <Stack.Navigator initialRouteName='Search'>
+      <Stack.Screen name = "SearchScreen" component={SearchScreen} options={{ headerShown: false }}/>
+      <Stack.Screen name = "SearchResult" component={SearchResult} options={({route}) => ({title:route.params.name})}/>
     </Stack.Navigator>
   )
 }

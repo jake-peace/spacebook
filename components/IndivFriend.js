@@ -7,8 +7,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const IndivFriend = ({ navigation, route }) => {
 
     const {friend_id} = route.params;
+    const {name} = route.params;
     const [postList, setPostList] = useState([]);
     const [isMessage, setIsMessage] = useState(false);
+    const [isFriends, setIsFriends] = useState(false);
   
     useEffect(() => { 
       checkLoggedIn();
@@ -42,6 +44,7 @@ const IndivFriend = ({ navigation, route }) => {
       })
       .then(async (responseJson) => {
               setPostList(responseJson);
+              setIsFriends(true);
       })
       .catch((error) => {
           console.log(error);
@@ -100,6 +103,13 @@ const IndivFriend = ({ navigation, route }) => {
           >
             <Text>Go Back</Text>
           </TouchableOpacity>
+        </View>
+      )
+    }
+    else if(isFriends == false){
+      return (
+        <View>
+          <Text>You aren't friends with {name}!</Text>
         </View>
       )
     }
