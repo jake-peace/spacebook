@@ -19,6 +19,7 @@ import FriendScreen from './components/Friends';
 import IndividualFriendScreen from './components/IndivFriend';
 import SearchScreen from './components/Search';
 import SearchResult from './components/SearchResult';
+import PostScreen from './components/Post.js';
 
 
 
@@ -41,6 +42,7 @@ const Feed = () => {
     <Stack.Navigator initialRouteName='MainFeed'>
       <Stack.Screen name="MainFeed" component={FeedScreen}/>
       <Stack.Screen name="IndividualFriend" component={IndividualFriendScreen} options={({route}) => ({title:route.params.name + "'s profile"})} />
+      <Stack.Screen name="WritePost" component={PostScreen} options={{ headerShown: false}}/>
     </Stack.Navigator>
   )
 }

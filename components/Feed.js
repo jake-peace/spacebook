@@ -31,7 +31,6 @@ const FeedScreen = ({ navigation, route }) => {
 
   const [firstName, setFirstName] = useState('');
   const [friendList, setFriendList] = useState([]);
-  const [ppList, setPPList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => { 
@@ -68,40 +67,7 @@ const FeedScreen = ({ navigation, route }) => {
     })
     .then(async (responseJson) => {
         setFriendList(responseJson)
-        console.log(responseJson)
-        console.log(friendList)
-        for(var i = 0; i < responseJson.length; i++){
-          getFriendPP(responseJson[i].user_id)
-        }
         setIsLoading(false);
-    })
-    .catch((error) => {
-        console.log(error);
-    })
-  }
-
-  const getFriendPP = async (friend_id) => {
-    const value = await AsyncStorage.getItem('@session_token');
-    return fetch("http://localhost:3333/api/1.0.0/user/" + friend_id + "/photo", {
-        method: 'get',
-        headers: {
-        'X-Authorization':  value,
-        'Content-Type': 'application/json'
-        }
-    })
-    .then((response) => {
-        if(response.status === 200){
-            return response.blob();
-        }else if(response.status === 401){
-            this.props.navigation.navigate("Login");
-        }else{
-            throw 'Something went wrong';
-        }
-    })
-    .then((responseBlob) => {
-        let data = URL.createObjectURL(responseBlob);
-        setPPList([...ppList, data]);
-        console.log(ppList)
     })
     .catch((error) => {
         console.log(error);
@@ -165,13 +131,9 @@ const FeedScreen = ({ navigation, route }) => {
             data={friendList}
             renderItem={({item, index}) => (
             <View>
-              <Image
-                  style={styles.image}
-                  source={ppList[index]}
-              />
               <Text>{item.user_givenname} {item.user_familyname}</Text>
               <TouchableOpacity
-                onPress={() => navigation.navigate('IndividualFriend', {friend_id: item.user_id, name: item.user_givenname})}
+                onPress={() => navigation.navigate('IndividualFriend', {friend_id: item.user_id, name: item.user_givenname, lastName: item.user_familyname})}
               >
                 <Text>View {item.user_givenname}'s profile</Text>
               </TouchableOpacity>

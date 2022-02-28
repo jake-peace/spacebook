@@ -58,7 +58,7 @@ const SearchResult = ({ navigation, route }) => {
               <TouchableOpacity
                 onPress={() => navigation.navigate('IndividualFriend', {friend_id: item.user_id, name: item.user_givenname})}
               >
-                <Text>View {item.first_name}'s profile</Text>
+                <Text>View {item.user_givenname}'s profile</Text>
               </TouchableOpacity>
             </View>
               )}
