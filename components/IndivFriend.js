@@ -149,8 +149,8 @@ const IndivFriend = ({ navigation, route }) => {
     const formatDate = (timestamp) => {
         var date = new Date(timestamp);
         return (
-            date.getDay().toString() + "/" + 
-            date.getMonth().toString() + "/" +
+            date.getDate().toString() + "/" + 
+            (date.getMonth() + 1).toString() + "/" +
             date.getFullYear().toString() + " at " +
             date.getHours().toString() + ":" +
             date.getMinutes().toString());

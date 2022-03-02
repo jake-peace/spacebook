@@ -29,10 +29,10 @@ const Stack = createNativeStackNavigator();
 const Main = () => {
   return (
     <Tab.Navigator>
-      <Tab.Screen name="Feed" component={Feed} options={{ headerShown: false }}/>
-      <Tab.Screen name="Profile" component={ProfileScreen} />
-      <Tab.Screen name="Friends" component={FriendScreen} options={{ title: 'Friend Requests'}} />
-      <Tab.Screen name="Search" component={Search} options={{ headerShown: false }}/>
+      <Tab.Screen name="Feed" component={Feed} options={{ title: 'Friends', headerShown: false, tabBarIcon: () => (<Image source={require("./icons/friends.png")} style={{width: 20, height: 20}} />) }}/>
+      <Tab.Screen name="Profile" component={ProfileScreen} options={{tabBarIcon: () => (<Image source={require("./icons/profike.png")} style={{width: 20, height: 20}} />)}}/>
+      <Tab.Screen name="Friends" component={FriendScreen} options={{ title: 'Friend Requests', tabBarIcon: () => (<Image source={require("./icons/friendrequest.png")} style={{width: 20, height: 20}} />) }} />
+      <Tab.Screen name="Search" component={Search} options={{ headerShown: false, tabBarIcon: () => (<Image source={require("./icons/search.png")} style={{width: 20, height: 20}} />) }}/>
     </Tab.Navigator>
   );
 }
