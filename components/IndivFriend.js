@@ -14,6 +14,7 @@ const IndivFriend = ({ navigation, route }) => {
     const [isFriends, setIsFriends] = useState(false);
     const [alreadyRequested, setAlreadyRequested] = useState(false)
     const [friendPP, setFriendPP] = useState('')
+    const [alreadyLiked, setAlreadyLiked] = useState(false)
   
     useEffect(() => { 
       checkLoggedIn();
@@ -68,7 +69,7 @@ const IndivFriend = ({ navigation, route }) => {
           if(response.status === 200){
               return response.json()
           }else if(response.status === 400){
-              throw 'Invalid usename or passeord';
+              throw 'Invalid username or passeord';
           }else{
               throw 'Something went wrong';
           }
@@ -131,7 +132,8 @@ const IndivFriend = ({ navigation, route }) => {
                   return response.json()
               }else if(response.status === 400){
                   throw 'Already liked post';
-              }else if(response.status === 404){
+              }else if(response.status === 403){
+                  setAlreadyLiked(true)
                   throw 'Not found'
               }else{
                   throw 'Something went wrong';
@@ -141,7 +143,7 @@ const IndivFriend = ({ navigation, route }) => {
                   console.log("hello")
           })
           .catch((error) => {
-              setRefresh(true)
+              if(alreadyLiked == false){setRefresh(true)}
               console.log(error);
           })
     }
@@ -161,6 +163,13 @@ const IndivFriend = ({ navigation, route }) => {
         return(
           <View>
             <Text>You've already sent a friend request to {name}.</Text>
+          </View>
+        )
+      }
+      if(alreadyLiked == true){
+        return(
+          <View>
+            <Text>You cannot like posts that you wrote.</Text>
           </View>
         )
       }

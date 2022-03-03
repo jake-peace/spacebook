@@ -1,10 +1,7 @@
-import React, {useState, useEffect} from 'react';
-import { StyleSheet, View, Text, Image, ScrollView, TextInput } from 'react-native';
-import { NavigationContainer, useLinkProps } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React, {useState} from 'react';
+import { StyleSheet, View, Text, ScrollView, TextInput } from 'react-native';
 import { TouchableOpacity } from 'react-native-web';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-//import { createDrawerNavigator } from '@react-navigation/drawer';
 
   const LoginScreen = ({ navigation }) => {
 
@@ -19,7 +16,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
       {setEmail('')}
       {setPassword('')}
-      //Validation here...
     
       return fetch("http://localhost:3333/api/1.0.0/login", {
           method: 'post',

@@ -42,7 +42,7 @@ const FeedScreen = ({ navigation, route }) => {
   const checkLoggedIn = async () => {
     const value = await AsyncStorage.getItem('@session_token');
     if (value == null) {
-        this.props.navigation.navigate('Login');
+        navigation.navigate('Login');
     }
   }
 
@@ -74,6 +74,12 @@ const FeedScreen = ({ navigation, route }) => {
     })
   }
 
+  const logout = async () => {
+    await AsyncStorage.setItem('@session_token', null);
+    await AsyncStorage.setItem('@user_id', null);
+    navigation.navigate("Login");
+  }
+
   const getData = async () => {
     const value = await AsyncStorage.getItem('@session_token');
     const user_id = await AsyncStorage.getItem('@user_id');
@@ -88,7 +94,7 @@ const FeedScreen = ({ navigation, route }) => {
             if(response.status === 200){
                 return response.json()
             }else if(response.status === 401){
-              this.props.navigation.navigate("Login");
+                navigation.navigate("Login");
             }else{
                 throw 'Something went wrong';
             }
@@ -126,13 +132,19 @@ const FeedScreen = ({ navigation, route }) => {
           >
             <Text>Refresh Page</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => logout()}
+          >
+            <Text>Logout</Text>
+          </TouchableOpacity>
           <Text>Welcome {firstName}. Your friends are below.</Text>
           <FlatList
             data={friendList}
             renderItem={({item, index}) => (
-            <View>
-              <Text>{item.user_givenname} {item.user_familyname}</Text>
+            <View style={styles.listItem}>
+              <Text style={styles.listName}>{item.user_givenname} {item.user_familyname}</Text>
               <TouchableOpacity
+                style={styles.listLink}
                 onPress={() => navigation.navigate('IndividualFriend', {friend_id: item.user_id, name: item.user_givenname, lastName: item.user_familyname})}
               >
                 <Text>View {item.user_givenname}'s profile</Text>
@@ -425,7 +437,30 @@ const styles = StyleSheet.create({
       height: '100px',
       width: '100px',
       borderRadius: '50px'
+  },
+
+  listItem: {
+    borderColor: '#ffcc0e',
+    borderWidth: '10px',
+    margin: '10px',
+    padding: '5px',
+    borderRadius: '20px'
+  },
+
+  listLink: {
+    color: '#000000',
+  },
+
+  listName: {
+    fontSize: '20px',
+    fontWeight: 'bold',
+    alignContent: 'center',
+    margin: 'auto',
+    textAlign:'center', 
+    padding: 5, 
   }
+
+
 })
 
 export default FeedScreen;
