@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
-import { StyleSheet, View, Text, Image, ScrollView, TextInput, FlatList, DevSettings } from 'react-native';
+import { StyleSheet, View, Text, Image, ScrollView, TextInput, FlatList, DevSettings, SafeAreaView } from 'react-native';
 import { NavigationContainer, useLinkProps } from '@react-navigation/native';
-import { TouchableHighlight, TouchableOpacity } from 'react-native-web';
+import { TouchableHighlight, TouchableOpacity, TouchableWithoutFeedback } from 'react-native-web';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const IndivFriend = ({ navigation, route }) => {
@@ -15,7 +15,10 @@ const IndivFriend = ({ navigation, route }) => {
     const [alreadyRequested, setAlreadyRequested] = useState(false)
     const [friendPP, setFriendPP] = useState('')
     const [alreadyLiked, setAlreadyLiked] = useState(false)
+    const [yourPost, setYourPost] = useState(false)
     const [myID, setMyID] = useState('');
+    const [errorPost, setErrorPost] = useState(999);
+    const [requestSent, setRequestSent] = useState(false);
   
     useEffect(() => { 
       checkLoggedIn();
@@ -97,8 +100,8 @@ const IndivFriend = ({ navigation, route }) => {
           },
       })
       .then((response) => {
-          if(response.status === 200){
-              return response.json()
+          if(response.status === 201){
+              return
           }else if(response.status === 403){
               setAlreadyRequested(true);
               setRefresh(true)
@@ -107,9 +110,10 @@ const IndivFriend = ({ navigation, route }) => {
               throw 'Something went wrong';
           }
       })
-      .then(async (responseJson) => {
+      .then(async () => {
           setRefresh(true)
           setAlreadyRequested(false)
+          setRequestSent(true)
       })
       .catch((error) => {
           console.log(error);
@@ -122,6 +126,7 @@ const IndivFriend = ({ navigation, route }) => {
         let methodType = '';
         if(like == true){methodType = 'POST'}
         else{methodType = 'DELETE'};
+        console.log("LIKED POST SUCCESSFUL " + friend_id + " " + postId)
         return fetch("http://localhost:3333/api/1.0.0/user/" + friend_id + "/post/" + postId + "/like", {
               method: methodType,
               headers: {
@@ -131,18 +136,25 @@ const IndivFriend = ({ navigation, route }) => {
           })
           .then((response) => {
               if(response.status === 200){
-                  return response.json()
+                  return
               }else if(response.status === 400){
+                  setRefresh(true);
+                  setAlreadyLiked(true);
+                  setErrorPost(postId);
                   throw 'Already liked post';
               }else if(response.status === 403){
-                  setAlreadyLiked(true)
+                  setYourPost(true)
+                  setErrorPost(postId)
                   throw 'Not found'
               }else{
                   throw 'Something went wrong';
               }
           })
-          .then(async (responseJson) => {
-                  console.log("hello")
+          .then(async () => {
+                  setAlreadyLiked(false);
+                  setYourPost(false)
+                  setErrorPost(999);
+                  setRefresh(true);
           })
           .catch((error) => {
               if(alreadyLiked == false){setRefresh(true)}
@@ -160,18 +172,49 @@ const IndivFriend = ({ navigation, route }) => {
             date.getFullYear().toString());
     }
 
-    const error = () => {
-      if(alreadyRequested == true){
+    const error = (post_id) => {
+      if(alreadyRequested == true && errorPost == post_id){
         return(
           <View>
-            <Text>You've already sent a friend request to {name}.</Text>
+            <Text style={styles.profileName}>You've already sent a friend request to {name}.</Text>
           </View>
         )
       }
-      if(alreadyLiked == true){
+      if(requestSent == true){
         return(
           <View>
-            <Text>You cannot like posts that you wrote.</Text>
+            <Text style={styles.profileName}>Request Sent!</Text>
+          </View>
+        )
+      }
+      if(alreadyLiked == true && errorPost == post_id){
+        return(
+          <View>
+            <Text>You've already liked this post.</Text>
+          </View>
+        )
+      }
+      if(yourPost == true && errorPost == post_id){
+        return(
+          <View>
+            <Text>You can't like posts that you wrote.</Text>
+          </View>
+        )
+      }
+    }
+
+    const timeAndLikes = (timestamp, numLikes) => {
+      if(numLikes == 1){
+        return (
+          <View>
+            <Text>{formatDate(timestamp)} • {numLikes} like</Text>
+          </View>
+        )
+      }
+      else{
+        return (
+          <View>
+            <Text>{formatDate(timestamp)} • {numLikes} likes</Text>
           </View>
         )
       }
@@ -191,9 +234,10 @@ const IndivFriend = ({ navigation, route }) => {
     if(isFriends == false){
       return (
         <View>
-          {error()}
-          <Text>You aren't friends with {name}!</Text>
+          {error(999)}
+          <Text style={styles.listItem}>You aren't friends with {name}!</Text>
           <TouchableOpacity
+            style={styles.standardButton}
             onPress={() => sendFriendRequest()}
           >
             <Text>Send a friend request</Text>
@@ -203,8 +247,8 @@ const IndivFriend = ({ navigation, route }) => {
     }
     else{
       return (
-        <View>
-          {error()}
+        <View style={{flex:1}}>
+          
           <View style={styles.profileHeader}>
             <Image
                 style={styles.image}
@@ -218,32 +262,40 @@ const IndivFriend = ({ navigation, route }) => {
           >
             <Text>Post on {name}'s wall</Text>
           </TouchableOpacity>
+          <SafeAreaView style={{flex: '1'}}>
           <ScrollView>
           <FlatList
+            vertical
             style={styles.list}
             data={postList}
             renderItem={({item}) => (
+            
             <View style={styles.listItem}>
-              <Text>{formatName(item.author.first_name, item.author.last_name, item.author.user_id)}</Text>
+              {error(item.post_id)}
+              <Text style={{fontWeight:'bold'}}>{formatName(item.author.first_name, item.author.last_name, item.author.user_id)}</Text>
               <Text>"{item.text}"</Text>
-              <View>
-                <Text>{formatDate(item.timestamp)} • {item.numLikes} likes</Text>
+              {timeAndLikes(item.timestamp, item.numLikes)}
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  style={styles.standardButton}
+                  onPress={() => likePost(item.post_id, true)}
+                >
+                  <Text>Like post</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.standardButton}
+                  onPress={() => likePost(item.post_id, false)}
+                >
+                  <Text>Unlike post</Text>
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity
-                onPress={() => likePost(item.post_id, true)}
-              >
-                <Text>Like post</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => likePost(item.post_id, false)}
-              >
-                <Text>Unlike post</Text>
-              </TouchableOpacity>
             </View>
+            
               )}
             keyExtractor={(item,index) => item.post_id.toString()}
           />
           </ScrollView>
+          </SafeAreaView>
         </View>
       )
 
@@ -253,6 +305,11 @@ const IndivFriend = ({ navigation, route }) => {
   }
 
 const styles = StyleSheet.create({
+  buttonContainer: {
+    alignContent: 'center',
+    flexDirection: 'row',
+  },
+
     profileHeader: {
       alignItems: 'center',
       flexDirection: 'row',
@@ -263,7 +320,6 @@ const styles = StyleSheet.create({
 
     list: {
       margin: '5px',
-      flex: '1'
     },
 
     standardButton: {

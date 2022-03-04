@@ -1,5 +1,5 @@
 import React, {useState, useEffect, Component} from 'react';
-import { StyleSheet, View, Text, Image, ScrollView, TextInput, FlatList } from 'react-native';
+import { StyleSheet, View, Text, Image, ScrollView, TextInput, FlatList, SafeAreaView } from 'react-native';
 import { NavigationContainer, useLinkProps } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { TouchableOpacity } from 'react-native-web';
@@ -49,13 +49,15 @@ const SearchResult = ({ navigation, route }) => {
   }
 
     return (
-    <View>
+    <View style={{flex:1}}>
+      <ScrollView>
       <FlatList
             data={searchResults}
             renderItem={({item, index}) => (
-            <View>
-              <Text>{item.user_givenname} {item.user_familyname}</Text>
+            <View style={styles.listItem}>
+              <Text style={{fontWeight: 'bold'}}>{item.user_givenname} {item.user_familyname}</Text>
               <TouchableOpacity
+                style={styles.standardButton}
                 onPress={() => navigation.navigate('IndividualFriend', {friend_id: item.user_id, name: item.user_givenname})}
               >
                 <Text>View {item.user_givenname}'s profile</Text>
@@ -64,9 +66,36 @@ const SearchResult = ({ navigation, route }) => {
               )}
             keyExtractor={(item,index) => item.user_id.toString()}
           />
-        
+        </ScrollView>
     </View>
     )
 }
+
+const styles = StyleSheet.create({
+
+  standardButton: {
+    margin: 'auto',
+    marginTop: '10px',
+    marginBottom: '10px',
+    backgroundColor: 'white',
+    color: '#ffcc0e',
+    borderColor: '#ffcc0e',
+    borderWidth: '2px',
+    padding: '7.5px',
+    borderRadius: '5px',
+    width: '40%',
+    textAlign: 'center',
+  },
+
+  listItem: {
+    borderColor: '#ffcc0e',
+    borderWidth: '10px',
+    margin: '10px',
+    padding: '5px',
+    borderRadius: '20px',
+    alignItems: 'left',
+    justifyContent: 'center'
+  },
+})
 
 export default SearchResult;

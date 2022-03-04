@@ -20,41 +20,16 @@ const SearchScreen = ({ navigation, route }) => {
     }
   }
 
-  const performSearch = async (searchQuery) => {
-    const value = await AsyncStorage.getItem('@session_token');
-    const user_id = await AsyncStorage.getItem('@user_id');
-    return fetch("http://localhost:3333/api/1.0.0/search?q=" + searchQuery, {
-          method: 'get',
-          headers: {
-            'X-Authorization':  value,
-            'Content-Type': 'application/json'
-          }
-        })
-        .then((response) => {
-            if(response.status === 200){
-                return response.json()
-            }else if(response.status === 401){
-              this.props.navigation.navigate("Login");
-            }else{
-                throw 'Something went wrong';
-            }
-        })
-        .then((responseJson) => {
-            setFirstName(responseJson.first_name)
-        })
-        .catch((error) => {
-            console.log(error);
-        })
-  }
-
     return (
-    <View>
+    <View style={{alignContent: 'center', justifyContent: 'center', margin:'auto'}}>
         <TextInput
+            style={styles.textInput}
             placeholder='Search'
             value={searchTerm}
             onChangeText={newsearchTerm => setSearchTerm(newsearchTerm)}
         />
         <TouchableOpacity
+            style={styles.standardButton}
             onPress={() => navigation.navigate('SearchResult', {searchTerm: searchTerm, name: searchTerm})}
         >
             <Text>Enter</Text>
@@ -62,5 +37,34 @@ const SearchScreen = ({ navigation, route }) => {
     </View>
     )
 }
+
+const styles = StyleSheet.create({
+  textInput: {
+    textAlign: 'center',
+    height: '30px',
+    borderRadius: '5px',
+    padding: '10px',
+    backgroundColor: '#ffcc0e',
+    borderColor: 'black',
+    borderWidth: '2px',
+    marginTop: 0,
+    marginLeft: '10%',
+    width: '80%',
+  },
+
+  standardButton: {
+    margin: 'auto',
+    marginTop: '10px',
+    marginBottom: '10px',
+    backgroundColor: 'white',
+    color: '#ffcc0e',
+    borderColor: '#ffcc0e',
+    borderWidth: '2px',
+    padding: '7.5px',
+    borderRadius: '5px',
+    width: '40%',
+    textAlign: 'center',
+  },
+})
 
 export default SearchScreen;

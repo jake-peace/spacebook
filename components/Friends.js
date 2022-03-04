@@ -44,37 +44,7 @@ const Friends = ({ navigation, route }) => {
         })
         .then((responseJson) => {
             setFriendList(responseJson)
-            for(var i = 0; i < responseJson.length; i++){
-                getFriendPP(responseJson[i].user_id)
-            }
             setIsLoading(false);
-        })
-        .catch((error) => {
-            console.log(error);
-        })
-    }
-
-    const getFriendPP = async (friend_id) => {
-        const value = await AsyncStorage.getItem('@session_token');
-        return fetch("http://localhost:3333/api/1.0.0/user/" + friend_id + "/photo", {
-            method: 'get',
-            headers: {
-            'X-Authorization':  value,
-            'Content-Type': 'application/json'
-            }
-        })
-        .then((response) => {
-            if(response.status === 200){
-                return response.blob();
-            }else if(response.status === 401){
-                this.props.navigation.navigate("Login");
-            }else{
-                throw 'Something went wrong';
-            }
-        })
-        .then((responseBlob) => {
-            let data = URL.createObjectURL(responseBlob);
-            setPPList([...ppList, data]);
         })
         .catch((error) => {
             console.log(error);
@@ -127,30 +97,26 @@ const Friends = ({ navigation, route }) => {
         }else{
         return ( 
             <View>
-                <Text>you have {friendList.length} friend requests</Text>
+                <Text style={styles.header}>{friendList.length} friend requests</Text>
                 <FlatList
                 data={friendList}
                 renderItem={({item, index}) => (
                 <View>
-                    <Text>{item.first_name} {item.last_name} has sent you a friend request</Text>
-                    <Image
-                        style={styles.image}
-                        source={ppList[index]}
-                    />
-                    {console.log(ppList[0])}
-                    <Text>their photo</Text>
-                    <TouchableOpacity
-                    style={styles.acceptButton}
-                    onPress={() => acceptRequest(item.user_id, true)}
-                    >
-                    <Text>Accept Request</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                    style={styles.rejectButton}
-                    onPress={() => acceptRequest(item.user_id, false)}
-                    >
-                    <Text>Reject Request</Text>
-                    </TouchableOpacity>
+                    <Text style={styles.listName}>{item.first_name} {item.last_name} has sent you a friend request</Text>
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity
+                        style={styles.standardButton}
+                        onPress={() => acceptRequest(item.user_id, true)}
+                        >
+                        <Text>Accept Request</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                        style={styles.standardButton}
+                        onPress={() => acceptRequest(item.user_id, false)}
+                        >
+                        <Text>Reject Request</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
                     )}
                 keyExtractor={(item,index) => item.user_id.toString()}
@@ -312,21 +278,59 @@ render() {
 */
 
 const styles = StyleSheet.create({
-    image: {
-        height: '100px',
-        width: '100px',
-        borderRadius: '50px'
-    },
-
-    postButton: {
-        borderRadius: '25px',
-        height: '50px',
-        width: '50px',
-        backgroundColor: '#ffcc0e',
+    buttonContainer: {
+        alignContent: 'center',
+        flexDirection: 'row',
+      },
+    
+      standardButton: {
+        margin: 'auto',
+        marginTop: '10px',
+        backgroundColor: 'white',
+        color: '#ffcc0e',
+        borderColor: '#ffcc0e',
+        borderWidth: '2px',
+        padding: '7.5px',
+        borderRadius: '5px',
+        width: '40%',
         textAlign: 'center',
-        justifyContent: 'center',
-        color: 'white'
-    }
+      },
+    
+      image: {
+          height: '100px',
+          width: '100px',
+          borderRadius: '50px'
+      },
+    
+      header: {
+        fontWeight: 'bold',
+        alignContent: 'center',
+        margin: 'auto',
+        textAlign:'center', 
+        padding: 5, 
+      },
+    
+      listItem: {
+        borderColor: '#ffcc0e',
+        borderWidth: '10px',
+        margin: '10px',
+        padding: '5px',
+        borderRadius: '20px',
+        alignItems: 'left',
+        justifyContent: 'center'
+      },
+    
+      listLink: {
+        color: '#000000',
+        textAlign: "right",
+      },
+    
+      listName: {
+        fontSize: '20px',
+        fontWeight: 'bold',
+        textAlign:'left', 
+        padding: 5, 
+      }
 })
 
 export default Friends;
