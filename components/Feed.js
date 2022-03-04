@@ -127,29 +127,30 @@ const FeedScreen = ({ navigation, route }) => {
     else{
       return (
         <View>
-          <TouchableOpacity
-            onPress={() => refreshPage()}
-          >
-            <Text>Refresh Page</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => logout()}
-          >
-            <Text>Logout</Text>
-          </TouchableOpacity>
-          <Text>Welcome {firstName}. Your friends are below.</Text>
+          <View style={styles.topButtonContainer}>
+            <TouchableOpacity
+              style={styles.standardButton}
+              onPress={() => refreshPage()}
+            >
+              <Text>Refresh Page</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.standardButton}
+              onPress={() => logout()}
+            >
+              <Text>Logout</Text>
+            </TouchableOpacity>
+          </View>
+        <Text style={styles.header}>Welcome {firstName}! Your friends are below.</Text>
           <FlatList
             data={friendList}
             renderItem={({item, index}) => (
-            <View style={styles.listItem}>
+            <TouchableOpacity style={styles.listItem}
+            onPress={() => navigation.navigate('IndividualFriend', {friend_id: item.user_id, name: item.user_givenname, lastName: item.user_familyname})}
+            >
               <Text style={styles.listName}>{item.user_givenname} {item.user_familyname}</Text>
-              <TouchableOpacity
-                style={styles.listLink}
-                onPress={() => navigation.navigate('IndividualFriend', {friend_id: item.user_id, name: item.user_givenname, lastName: item.user_familyname})}
-              >
-                <Text>View {item.user_givenname}'s profile</Text>
-              </TouchableOpacity>
-            </View>
+              <Text style={styles.listLink}>View {item.user_givenname}'s profile</Text>
+            </TouchableOpacity>
               )}
             keyExtractor={(item,index) => item.user_id.toString()}
           />
@@ -433,10 +434,36 @@ getFriendPP = async (user_id) => {
 }
 */
 const styles = StyleSheet.create({
+  topButtonContainer: {
+    alignContent: 'center',
+    flexDirection: 'row',
+  },
+
+  standardButton: {
+    margin: 'auto',
+    marginTop: '10px',
+    backgroundColor: 'white',
+    color: '#ffcc0e',
+    borderColor: '#ffcc0e',
+    borderWidth: '2px',
+    padding: '7.5px',
+    borderRadius: '5px',
+    width: '40%',
+    textAlign: 'center',
+  },
+
   image: {
       height: '100px',
       width: '100px',
       borderRadius: '50px'
+  },
+
+  header: {
+    fontWeight: 'bold',
+    alignContent: 'center',
+    margin: 'auto',
+    textAlign:'center', 
+    padding: 5, 
   },
 
   listItem: {
@@ -444,19 +471,20 @@ const styles = StyleSheet.create({
     borderWidth: '10px',
     margin: '10px',
     padding: '5px',
-    borderRadius: '20px'
+    borderRadius: '20px',
+    alignItems: 'left',
+    justifyContent: 'center'
   },
 
   listLink: {
     color: '#000000',
+    textAlign: "right",
   },
 
   listName: {
     fontSize: '20px',
     fontWeight: 'bold',
-    alignContent: 'center',
-    margin: 'auto',
-    textAlign:'center', 
+    textAlign:'left', 
     padding: 5, 
   }
 

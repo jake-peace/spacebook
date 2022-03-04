@@ -15,6 +15,7 @@ const IndivFriend = ({ navigation, route }) => {
     const [alreadyRequested, setAlreadyRequested] = useState(false)
     const [friendPP, setFriendPP] = useState('')
     const [alreadyLiked, setAlreadyLiked] = useState(false)
+    const [myID, setMyID] = useState('');
   
     useEffect(() => { 
       checkLoggedIn();
@@ -58,6 +59,7 @@ const IndivFriend = ({ navigation, route }) => {
   
     const getFriendsPosts = async () => {
       const value = await AsyncStorage.getItem('@session_token');
+      setMyID(await AsyncStorage.getItem('@user_id'));
       return fetch("http://localhost:3333/api/1.0.0/user/" + friend_id + "/post", {
           method: 'get',
           headers: {
@@ -151,11 +153,11 @@ const IndivFriend = ({ navigation, route }) => {
     const formatDate = (timestamp) => {
         var date = new Date(timestamp);
         return (
+            date.getHours().toString() + ":" +
+            date.getMinutes().toString() + " • " +
             date.getDate().toString() + "/" + 
             (date.getMonth() + 1).toString() + "/" +
-            date.getFullYear().toString() + " at " +
-            date.getHours().toString() + ":" +
-            date.getMinutes().toString());
+            date.getFullYear().toString());
     }
 
     const error = () => {
@@ -172,6 +174,17 @@ const IndivFriend = ({ navigation, route }) => {
             <Text>You cannot like posts that you wrote.</Text>
           </View>
         )
+      }
+    }
+
+    const formatName = (firstName, lastName, userID) => {
+      if(myID == userID){
+        return(
+          "You"
+        )
+      }
+      else{
+        return(firstName + " " + lastName);
       }
     }
   
@@ -192,23 +205,30 @@ const IndivFriend = ({ navigation, route }) => {
       return (
         <View>
           {error()}
-          <Image
-              style={styles.image}
-              source={friendPP}
-          />
-          <Text>{name} {lastName}</Text>
+          <View style={styles.profileHeader}>
+            <Image
+                style={styles.image}
+                source={friendPP}
+            />
+            <Text style={styles.profileName}>{name} {lastName}</Text>
+          </View>
           <TouchableOpacity
+            style={styles.standardButton}
             onPress={() => navigation.navigate('WritePost', {friend_id: friend_id, name: name})}
           >
             <Text>Post on {name}'s wall</Text>
           </TouchableOpacity>
+          <ScrollView>
           <FlatList
+            style={styles.list}
             data={postList}
             renderItem={({item}) => (
-            <View>
-              <Text>on {formatDate(item.timestamp)}, {item.author.first_name} {item.author.last_name} said: </Text>
+            <View style={styles.listItem}>
+              <Text>{formatName(item.author.first_name, item.author.last_name, item.author.user_id)}</Text>
               <Text>"{item.text}"</Text>
-              <Text>{item.numLikes} likes</Text>
+              <View>
+                <Text>{formatDate(item.timestamp)} • {item.numLikes} likes</Text>
+              </View>
               <TouchableOpacity
                 onPress={() => likePost(item.post_id, true)}
               >
@@ -223,6 +243,7 @@ const IndivFriend = ({ navigation, route }) => {
               )}
             keyExtractor={(item,index) => item.post_id.toString()}
           />
+          </ScrollView>
         </View>
       )
 
@@ -232,10 +253,55 @@ const IndivFriend = ({ navigation, route }) => {
   }
 
 const styles = StyleSheet.create({
+    profileHeader: {
+      alignItems: 'center',
+      flexDirection: 'row',
+      padding: '10px',
+      margin: 'auto',
+      justifyContent: 'center',
+    },
+
+    list: {
+      margin: '5px',
+      flex: '1'
+    },
+
+    standardButton: {
+      margin: 'auto',
+      marginTop: '10px',
+      marginBottom: '10px',
+      backgroundColor: 'white',
+      color: '#ffcc0e',
+      borderColor: '#ffcc0e',
+      borderWidth: '2px',
+      padding: '7.5px',
+      borderRadius: '5px',
+      width: '40%',
+      textAlign: 'center',
+    },
+
+    profileName: {
+      fontSize: '30px',
+      fontStyle: 'bold',
+      margin: '15px',
+    },
+
     image: {
         height: '100px',
         width: '100px',
-        borderRadius: '50px'
+        borderRadius: '50px',
+        borderColor: '#ffcc0e',
+        borderWidth: '5px',
+    },
+
+    listItem: {
+      borderColor: '#ffcc0e',
+      borderWidth: '10px',
+      margin: '10px',
+      padding: '5px',
+      borderRadius: '20px',
+      alignItems: 'left',
+      justifyContent: 'center'
     },
 
     postButton: {
