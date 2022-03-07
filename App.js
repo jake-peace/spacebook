@@ -20,6 +20,7 @@ import IndividualFriendScreen from './components/IndivFriend';
 import SearchScreen from './components/Search';
 import SearchResult from './components/SearchResult';
 import PostScreen from './components/Post.js';
+import ChangePictureScreen from './components/ChangePicture';
 
 
 
@@ -30,7 +31,7 @@ const Main = () => {
   return (
     <Tab.Navigator>
       <Tab.Screen name="Feed" component={Feed} options={{ title: 'Friends', headerShown: false, tabBarIcon: () => (<Image source={require("./icons/friends.png")} style={{width: 20, height: 20}} />) }}/>
-      <Tab.Screen name="Profile" component={ProfileScreen} options={{title:"Your Profile"}, {tabBarIcon: () => (<Image source={require("./icons/profile.png")} style={{width: 20, height: 20}} />)}}/>
+      <Tab.Screen name="Profile" component={ProfileScreen} options={{title:"Your Profile", tabBarIcon: () => (<Image source={require("./icons/profile.png")} style={{width: 20, height: 20}} />)}}/>
       <Tab.Screen name="Friends" component={FriendScreen} options={{ title: 'Friend Requests', tabBarIcon: () => (<Image source={require("./icons/friendrequest.png")} style={{width: 20, height: 20}} />) }} />
       <Tab.Screen name="Search" component={Search} options={{ headerShown: false, tabBarIcon: () => (<Image source={require("./icons/search.png")} style={{width: 20, height: 20}} />) }}/>
     </Tab.Navigator>
@@ -43,6 +44,7 @@ const Feed = () => {
       <Stack.Screen name="MainFeed" component={FeedScreen} options={{ headerShown: false}}/>
       <Stack.Screen name="IndividualFriend" component={IndividualFriendScreen} options={({route}) => ({title:route.params.name + "'s profile"})} />
       <Stack.Screen name="WritePost" component={PostScreen} options={{ headerShown: false}}/>
+      <Stack.Screen name="ChangePicture" component={ChangePictureScreen} options={{ headerShown: false}}/>
     </Stack.Navigator>
   )
 }

@@ -156,7 +156,7 @@ const Profile = ({ navigation, route }) => {
         </TouchableOpacity>
         <TouchableOpacity
             style={styles.standardButton}
-            onPress={() => refreshPage()}
+            onPress={() => navigation.navigate('ChangePicture')}
         >
             <Text>Change Profile Picture</Text>
         </TouchableOpacity>
