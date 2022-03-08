@@ -4,6 +4,7 @@ import { NavigationContainer, useLinkProps } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { TouchableOpacity } from 'react-native-web';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { validate } from 'react-email-validator';
 
 const Signup = ({ navigation }) => {
 
@@ -32,6 +33,12 @@ const Signup = ({ navigation }) => {
       setBadPassword(true)
       return;
     }
+    else{setBadPassword(false)}
+
+    if(validate(email) == false){
+      setBadEmail(true)
+      return;
+    }else{setBadEmail(false)}
     
     // validation for email??
     // password validation is over 5 characters
@@ -48,7 +55,7 @@ const Signup = ({ navigation }) => {
         body: JSON.stringify(state)
     })
     .then((response) => {
-        if(response.status === 200){
+        if(response.status === 201){
             return response.json()
         }else if(response.status === 400){
             throw 'Bad request';
@@ -90,9 +97,10 @@ const Signup = ({ navigation }) => {
   if(successful == true)
   {
     return(
-      <View>
-        <Text>Account created!</Text>
+      <View style={styles.container}>
+        <Text style={styles.header}>Account created!</Text>
         <TouchableOpacity
+          style={styles.loginButton}
           onPress={() => navigation.navigate("Login")}
         >
           <Text>Back to login</Text>

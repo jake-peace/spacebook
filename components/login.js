@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [headerText, setHeaderText] = useState('Login')
 
     const login = async () => {
       const state = {
@@ -28,6 +29,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
           if(response.status === 200){
               return response.json()
           }else if(response.status === 400){
+              setHeaderText('Invalid email or password')
               throw 'Invalid email or password';
           }else{
               throw 'Something went wrong';
@@ -49,7 +51,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
     return (
       <View style={styles.container}>
-        <Text style={styles.header} >Login</Text>
+        <Text style={styles.header} >{headerText}</Text>
         <Text style={styles.textInputLabel} >Email</Text>
         <TextInput
           style={styles.textInput}
@@ -81,18 +83,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
         </TouchableOpacity>
       </View>
     );
-  }
-  
-  
-  function SignupScreen() {
-    return (
-      <ScrollView>
-        <View>
-          <Text>signupbelow</Text>
-          
-        </View>
-      </ScrollView>
-    )
   }
 
   const styles = StyleSheet.create({

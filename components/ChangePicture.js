@@ -6,7 +6,10 @@ import { TouchableOpacity } from 'react-native-web';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { render } from 'react-dom';
 
+
 const ChangePicture = ({ navigation, route }) => {
+
+  
 
   useEffect(() => { 
     checkLoggedIn();
@@ -23,15 +26,13 @@ const ChangePicture = ({ navigation, route }) => {
     const value = await AsyncStorage.getItem('@session_token');
     const user_id = await AsyncStorage.getItem('@user_id');
     const animalLink = "../icons/profilepics/bird.png"
-    const blob = animalLink.blob();
-    console.log(animalLink)
     return fetch("http://localhost:3333/api/1.0.0/user/" + user_id + "/photo", {
           method: 'post',
           headers: {
             'X-Authorization':  value,
             'Content-Type': 'image/png'
           },
-          body: blob
+          body: animalLink
         })
         .then((response) => {
             if(response.status === 200){
@@ -50,6 +51,7 @@ const ChangePicture = ({ navigation, route }) => {
         })
         .then(() => {
             console.log("Successful")
+            navigation.goBack();
         })
         .catch((error) => {
             console.log(error);
