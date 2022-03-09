@@ -73,6 +73,7 @@ const Profile = ({ navigation, route }) => {
       .then((responseBlob) => {
           let data = URL.createObjectURL(responseBlob);
           setUserPP(data);
+          setRefresh(false)
       })
       .catch((error) => {
           console.log(error);
@@ -119,6 +120,21 @@ const Profile = ({ navigation, route }) => {
             date.getDate().toString() + "/" + 
             (date.getMonth() + 1).toString() + "/" +
             date.getFullYear().toString());
+    }
+
+    const editPost = (userID, postID) => {
+        if(userData.user_id == userID){
+            return(
+                <View>
+                    <TouchableOpacity
+                        style={styles.standardButton}
+                        onPress={() => navigation.navigate('WritePost', {edit: true, post_id: postID, friend_id: userID, name: "you"})}
+                    >
+                        <Text>Edit Post</Text>
+                    </TouchableOpacity>
+                </View>
+            )
+        }
     }
 
     const formatName = (firstName, lastName, userID) => {
@@ -172,6 +188,7 @@ const Profile = ({ navigation, route }) => {
             <Text>"{item.text}"</Text>
             <View>
             <Text>{formatDate(item.timestamp)} • {item.numLikes} likes</Text>
+            {editPost(item.author.user_id, item.post_id)}
             </View>
         </View>
         

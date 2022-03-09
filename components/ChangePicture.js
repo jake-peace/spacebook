@@ -20,13 +20,16 @@ const ChangePicture = ({ navigation, route }) => {
     const value = await AsyncStorage.getItem('@session_token');
     const user_id = await AsyncStorage.getItem('@user_id');
     const animalLink = "../icons/profilepics/bird.png"
+    let res = await fetch(animalLink.base64);
+    let blob = await res.blob();
+
     return fetch("http://localhost:3333/api/1.0.0/user/" + user_id + "/photo", {
           method: 'post',
           headers: {
             'X-Authorization':  value,
             'Content-Type': 'image/png'
           },
-          body: animalLink
+          body: blob
         })
         .then((response) => {
             if(response.status === 200){

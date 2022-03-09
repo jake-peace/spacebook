@@ -202,6 +202,38 @@ const IndivFriend = ({ navigation, route }) => {
       }
     }
 
+    const editPost = (authorID, postID) => {
+      if(myID == authorID){
+          return(
+              <View style={styles.buttonContainer}>
+                  <TouchableOpacity
+                      style={styles.standardButton}
+                      onPress={() => navigation.navigate('WritePost', {edit: true, post_id: postID, friend_id: friend_id, name: "you"})}
+                  >
+                      <Text>Edit Post</Text>
+                  </TouchableOpacity>
+              </View>
+          )
+      }
+      else{
+        return(
+        <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.standardButton}
+          onPress={() => likePost(postID, true)}
+        >
+          <Text>Like post</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.standardButton}
+          onPress={() => likePost(postID, false)}
+        >
+          <Text>Unlike post</Text>
+        </TouchableOpacity>
+        </View>)
+      }
+  }
+
     const timeAndLikes = (timestamp, numLikes) => {
       if(numLikes == 1){
         return (
@@ -274,20 +306,7 @@ const IndivFriend = ({ navigation, route }) => {
               <Text style={{fontWeight:'bold'}}>{formatName(item.author.first_name, item.author.last_name, item.author.user_id)}</Text>
               <Text>"{item.text}"</Text>
               {timeAndLikes(item.timestamp, item.numLikes)}
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                  style={styles.standardButton}
-                  onPress={() => likePost(item.post_id, true)}
-                >
-                  <Text>Like post</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.standardButton}
-                  onPress={() => likePost(item.post_id, false)}
-                >
-                  <Text>Unlike post</Text>
-                </TouchableOpacity>
-              </View>
+              {editPost(item.author.user_id, item.post_id)}
             </View>
             
               )}

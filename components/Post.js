@@ -1,18 +1,22 @@
 import React, {useState, useEffect} from 'react';
 import { StyleSheet, View, Text, Image, ScrollView, TextInput, FlatList, DevSettings } from 'react-native';
-import { TouchableHighlight, TouchableOpacity } from 'react-native-web';
+import { TouchableOpacity } from 'react-native-web';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const IndivFriend = ({ navigation: { goBack }, route }) => {
 
     const {friend_id} = route.params;
     const {name} = route.params;
+    const {edit} = route.params;
+    const {post_id} = route.params;
     const [refresh, setRefresh] = useState(false);
     const [postText, setPostText] = useState('');
     const [postSent, setPostSent] = useState(false);
+    const [methodType, setMethodType] = useState('post')
   
     useEffect(() => { 
       checkLoggedIn();
+      checkIfEdit();
       setRefresh(false);
     },[refresh]);
   
@@ -23,13 +27,47 @@ const IndivFriend = ({ navigation: { goBack }, route }) => {
       }
     }
 
+    const checkIfEdit = async () => {
+      if(edit == true){
+        const value = await AsyncStorage.getItem('@session_token');
+        return fetch("http://localhost:3333/api/1.0.0/user/" + friend_id + "/post/" + post_id, {
+            method: 'GET',
+            headers: {
+                'X-Authorization': value,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then((response) => {
+            if(response.status === 200){
+                return response.json()
+            }else if(response.status === 403){
+                throw 'Nope!';
+            }else{
+                throw 'Something went wrong';
+            }
+        })
+        .then(async (responseJson) => {7
+            setPostText(responseJson.text)
+            setMethodType('PATCH')
+            edit = false
+            setRefresh(true)
+        })
+        .catch((error) => {
+            console.log(error);
+        })
+      }
+      
+    }
+
     const postToWall = async () => {
       const state = {
           text: postText
-      }  
+      }
+      let postID = '';
+      if(methodType == 'PATCH'){postID = '/' + post_id} 
       const value = await AsyncStorage.getItem('@session_token');
-      return fetch("http://localhost:3333/api/1.0.0/user/" + friend_id + "/post", {
-          method: 'post',
+      return fetch("http://localhost:3333/api/1.0.0/user/" + friend_id + "/post" + postID, {
+          method: methodType,
           headers: {
               'X-Authorization': value,
               'Content-Type': 'application/json'
@@ -78,8 +116,9 @@ const IndivFriend = ({ navigation: { goBack }, route }) => {
     }
 
     return (
-    <View>
+    <View style={{alignContent: 'center', justifyContent: 'center'}}>
         <TouchableOpacity
+            style={styles.standardButton}
             onPress={() => goBack()}
         >
             <Text>Go Back</Text>
@@ -87,13 +126,15 @@ const IndivFriend = ({ navigation: { goBack }, route }) => {
         {error()}
         <Text>Posting to {name}'s wall</Text>
         <TextInput
+            style={styles.listItem}
             multiline={true}
             numberOfLines={5}
             placeholder="What's on your mind"
             value={postText}
-            onChangeText={newPostText => setPostText(newPostText)}
+            onChangeText={setPostText}
         />
         <TouchableOpacity
+            style={styles.standardButton}
             onPress={() => postToWall()}
         >
             <Text>Send Post</Text>
@@ -104,21 +145,59 @@ const IndivFriend = ({ navigation: { goBack }, route }) => {
 }
 
 const styles = StyleSheet.create({
-    image: {
-        height: '100px',
-        width: '100px',
-        borderRadius: '50px'
-    },
-
-    postButton: {
-        borderRadius: '25px',
-        height: '50px',
-        width: '50px',
-        backgroundColor: '#ffcc0e',
+    topButtonContainer: {
+        alignContent: 'center',
+        flexDirection: 'row',
+      },
+    
+      standardButton: {
+        margin: 'auto',
+        marginTop: '10px',
+        backgroundColor: 'white',
+        color: '#ffcc0e',
+        borderColor: '#ffcc0e',
+        borderWidth: '2px',
+        padding: '7.5px',
+        borderRadius: '5px',
+        width: '40%',
         textAlign: 'center',
-        justifyContent: 'center',
-        color: 'white'
-    }
+      },
+    
+      image: {
+          height: '100px',
+          width: '100px',
+          borderRadius: '50px'
+      },
+    
+      header: {
+        fontWeight: 'bold',
+        alignContent: 'center',
+        margin: 'auto',
+        textAlign:'center', 
+        padding: 5, 
+      },
+    
+      listItem: {
+        borderColor: '#ffcc0e',
+        borderWidth: '10px',
+        margin: '10px',
+        padding: '5px',
+        borderRadius: '20px',
+        alignItems: 'left',
+        justifyContent: 'center'
+      },
+    
+      listLink: {
+        color: '#000000',
+        textAlign: "right",
+      },
+    
+      listName: {
+        fontSize: '20px',
+        fontWeight: 'bold',
+        textAlign:'left', 
+        padding: 5, 
+      }
 })
 
 export default IndivFriend;

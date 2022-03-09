@@ -58,6 +58,7 @@ const Signup = ({ navigation }) => {
         if(response.status === 201){
             return response.json()
         }else if(response.status === 400){
+            setBadEmail(true)
             throw 'Bad request';
         }else{
             throw 'Something went wrong';
