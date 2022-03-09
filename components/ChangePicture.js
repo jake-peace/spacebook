@@ -1,15 +1,9 @@
-import React, {useState, useEffect, Component} from 'react';
-import { StyleSheet, View, Text, Image, ScrollView, TextInput, FlatList } from 'react-native';
-import { NavigationContainer, useLinkProps } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React, {useEffect, Component} from 'react';
+import { StyleSheet, View, Text, Image} from 'react-native';
 import { TouchableOpacity } from 'react-native-web';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { render } from 'react-dom';
-
 
 const ChangePicture = ({ navigation, route }) => {
-
-  
 
   useEffect(() => { 
     checkLoggedIn();

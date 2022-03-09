@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { StyleSheet, View, Text, ScrollView, TextInput } from 'react-native';
+import { StyleSheet, View, Text, TextInput } from 'react-native';
 import { TouchableOpacity } from 'react-native-web';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 

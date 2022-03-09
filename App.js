@@ -1,15 +1,10 @@
-import React, {useState} from 'react';
-import { StyleSheet, View, Text, Image, ScrollView, TextInput } from 'react-native';
+import React from 'react';
+import { StyleSheet, Image } from 'react-native';
 import { NavigationContainer, useLinkProps } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { TouchableOpacity } from 'react-native-web';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 const Tab = createBottomTabNavigator();
-//import { createDrawerNavigator } from '@react-navigation/drawer';
-
-
 
 import LoginScreen from './components/login';
 import SignupScreen from './components/Signup';
@@ -22,9 +17,6 @@ import SearchResult from './components/SearchResult';
 import PostScreen from './components/Post.js';
 import ChangePictureScreen from './components/ChangePicture';
 
-
-
-//const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
 
 const Main = () => {
@@ -72,57 +64,5 @@ const App = () => {
     </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  textInput: {
-    textAlign: 'center',
-    height: '30px',
-    borderRadius: '5px',
-    padding: '10px',
-    backgroundColor: '#ffcc0e',
-    borderColor: 'black',
-    borderWidth: '2px',
-    marginTop: 0,
-    marginLeft: '10%',
-    width: '80%',
-  },
-
-  textInputLabel: {
-    flex: 1,
-    marginLeft: '10%',
-    marginTop: '1%'
-  },
-
-  container: {
-    alignItems: 'flex-start',
-    margin: 'auto',
-    width: '90%',
-    padding: 5,
-    backgroundColor: 'white',
-    borderRadius: '5px',
-  },
-
-  header: {
-    fontWeight: 'bold',
-    alignContent: 'center',
-    margin: 'auto',
-    textAlign:'center', 
-    padding: 5, 
-  },
-
-  loginButton: {
-    margin: 'auto',
-    marginTop: '10px',
-    backgroundColor: 'white',
-    color: '#ffcc0e',
-    borderColor: '#ffcc0e',
-    borderWidth: '2px',
-    padding: '7.5px',
-    borderRadius: '5px',
-    width: '60%',
-    textAlign: 'center',
-  }
-});
-
 
 export default App;
