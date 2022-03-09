@@ -1,7 +1,5 @@
 import React, {useState, useEffect, Component} from 'react';
 import { StyleSheet, View, Text, Image, ScrollView, TextInput, FlatList, SafeAreaView } from 'react-native';
-import { NavigationContainer, useLinkProps } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { TouchableOpacity } from 'react-native-web';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 

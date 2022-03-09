@@ -115,14 +115,14 @@ const Signup = ({ navigation }) => {
       <Text style={styles.textInputLabel} >First Name</Text>
       <TextInput
         style={styles.textInput}
-        placeholder='Trixie'
+        placeholder='first name'
         value={firstName}
         onChangeText={newFirstName => setFirstName(newFirstName)}
       />
       <Text style={styles.textInputLabel} >Last Name</Text>
       <TextInput
         style={styles.textInput}
-        placeholder='Mattel'
+        placeholder='last name'
         value={lastName}
         onChangeText={newLastName => setLastName(newLastName)}
       />

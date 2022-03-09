@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from 'react';
 import { StyleSheet, View, Text, Image, ScrollView, TextInput, FlatList, DevSettings } from 'react-native';
-import { NavigationContainer, useLinkProps } from '@react-navigation/native';
 import { TouchableHighlight, TouchableOpacity } from 'react-native-web';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -76,11 +75,6 @@ const IndivFriend = ({ navigation: { goBack }, route }) => {
                 </View>
             )
         }
-        return(
-            <View>
-            <Text></Text>
-            </View>
-        )
     }
 
     return (
