@@ -16,6 +16,7 @@ import SearchScreen from './components/Search';
 import SearchResult from './components/SearchResult';
 import PostScreen from './components/Post.js';
 import ChangePictureScreen from './components/ChangePicture';
+import EditUserScreen from './components/EditUser';
 
 const Stack = createNativeStackNavigator();
 
@@ -37,6 +38,7 @@ const Feed = () => {
       <Stack.Screen name="IndividualFriend" component={IndividualFriendScreen} options={({route}) => ({title:route.params.name + "'s profile"})} />
       <Stack.Screen name="WritePost" component={PostScreen} options={{ headerShown: false}}/>
       <Stack.Screen name="ChangePicture" component={ChangePictureScreen} options={{ headerShown: false}}/>
+      <Stack.Screen name ="EditUser" component={EditUserScreen} options={{ headerShown:false}}/>
     </Stack.Navigator>
   )
 }

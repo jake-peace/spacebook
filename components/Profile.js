@@ -157,6 +157,7 @@ const Profile = ({ navigation, route }) => {
         />
         <Text style={styles.profileName}>{userData.first_name} {userData.last_name}</Text>
         </View>
+        <View style={styles.buttonContainer}>
         <TouchableOpacity
         style={styles.standardButton}
         onPress={() => navigation.navigate('WritePost', {friend_id: userData.user_id, name: userData.first_name})}
@@ -169,12 +170,21 @@ const Profile = ({ navigation, route }) => {
         >
             <Text>Refresh Page</Text>
         </TouchableOpacity>
+        </View>
+        <View style={styles.buttonContainer}>
         <TouchableOpacity
             style={styles.standardButton}
             onPress={() => navigation.navigate('ChangePicture')}
         >
             <Text>Change Profile Picture</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+            style={styles.standardButton}
+            onPress={() => navigation.navigate('EditUser', {userInfo:userData})}
+        >
+            <Text>Edit Info</Text>
+        </TouchableOpacity>
+        </View>
         <SafeAreaView style={{flex: '1'}}>
         <ScrollView>
         <FlatList
@@ -214,6 +224,11 @@ const styles = StyleSheet.create({
     list: {
       margin: '5px',
     },
+
+    buttonContainer: {
+        alignContent: 'center',
+        flexDirection: 'row',
+      },
 
     standardButton: {
       margin: 'auto',
